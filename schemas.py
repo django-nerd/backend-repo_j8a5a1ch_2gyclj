@@ -1,48 +1,82 @@
 """
-Database Schemas
+Database Schemas for School Website
 
-Define your MongoDB collection schemas here using Pydantic models.
-These schemas are used for data validation in your application.
+Each Pydantic model below maps to a MongoDB collection with the lowercase
+of the class name as the collection name.
 
-Each Pydantic model represents a collection in your database.
-Model name is converted to lowercase for the collection name:
-- User -> "user" collection
-- Product -> "product" collection
-- BlogPost -> "blogs" collection
+Examples:
+- SchoolInfo -> "schoolinfo"
+- Department -> "department"
+- OsisMember -> "osismember"
 """
 
-from pydantic import BaseModel, Field
-from typing import Optional
+from pydantic import BaseModel, Field, EmailStr
+from typing import Optional, List
 
-# Example schemas (replace with your own):
 
-class User(BaseModel):
-    """
-    Users collection schema
-    Collection name: "user" (lowercase of class name)
-    """
-    name: str = Field(..., description="Full name")
-    email: str = Field(..., description="Email address")
-    address: str = Field(..., description="Address")
-    age: Optional[int] = Field(None, ge=0, le=120, description="Age in years")
-    is_active: bool = Field(True, description="Whether user is active")
+class SchoolInfo(BaseModel):
+    name: str = Field(..., description="School name")
+    tagline: Optional[str] = Field(None, description="Short tagline")
+    description: str = Field(..., description="About the school")
+    address: str = Field(..., description="School address")
+    phone: Optional[str] = Field(None, description="Phone number")
+    email: Optional[EmailStr] = Field(None, description="Public contact email")
+    hero_image: Optional[str] = Field(None, description="Hero image URL")
 
-class Product(BaseModel):
-    """
-    Products collection schema
-    Collection name: "product" (lowercase of class name)
-    """
-    title: str = Field(..., description="Product title")
-    description: Optional[str] = Field(None, description="Product description")
-    price: float = Field(..., ge=0, description="Price in dollars")
-    category: str = Field(..., description="Product category")
-    in_stock: bool = Field(True, description="Whether product is in stock")
 
-# Add your own schemas here:
-# --------------------------------------------------
+class Department(BaseModel):
+    name: str = Field(..., description="Department name")
+    head: Optional[str] = Field(None, description="Head of department")
+    description: Optional[str] = Field(None, description="Department details")
 
-# Note: The Flames database viewer will automatically:
-# 1. Read these schemas from GET /schema endpoint
-# 2. Use them for document validation when creating/editing
-# 3. Handle all database operations (CRUD) directly
-# 4. You don't need to create any database endpoints!
+
+class Teacher(BaseModel):
+    name: str = Field(..., description="Teacher full name")
+    subject: str = Field(..., description="Primary subject")
+    department: Optional[str] = Field(None, description="Department name")
+    photo: Optional[str] = Field(None, description="Photo URL")
+    bio: Optional[str] = Field(None, description="Short bio")
+
+
+class ClassRoom(BaseModel):
+    name: str = Field(..., description="Class identifier, e.g., X IPA 1")
+    level: int = Field(..., ge=7, le=12, description="Grade level")
+    homeroom_teacher: Optional[str] = Field(None, description="Homeroom teacher name")
+
+
+class Extracurricular(BaseModel):
+    name: str = Field(..., description="Club or extracurricular name")
+    mentor: Optional[str] = Field(None, description="Mentor/coach")
+    schedule: Optional[str] = Field(None, description="Meeting schedule")
+    description: Optional[str] = Field(None, description="Activity details")
+    icon: Optional[str] = Field(None, description="Icon name for UI")
+
+
+class OsisMember(BaseModel):
+    name: str = Field(..., description="Member name")
+    role: str = Field(..., description="Position in OSIS")
+    class_name: Optional[str] = Field(None, description="Class, e.g., XI IPA 2")
+    photo: Optional[str] = Field(None, description="Photo URL")
+    bio: Optional[str] = Field(None, description="Short bio or vision")
+
+
+class Event(BaseModel):
+    title: str = Field(..., description="Event title")
+    date: str = Field(..., description="Date string for simplicity")
+    location: Optional[str] = Field(None, description="Event location")
+    description: Optional[str] = Field(None, description="Event details")
+    category: Optional[str] = Field(None, description="Category: school/osis/academic/sport")
+
+
+class News(BaseModel):
+    title: str = Field(..., description="News headline")
+    summary: Optional[str] = Field(None, description="Short summary")
+    content: str = Field(..., description="Full content")
+    image: Optional[str] = Field(None, description="Cover image URL")
+    author: Optional[str] = Field(None, description="Author name")
+
+
+class ContactMessage(BaseModel):
+    name: str = Field(..., description="Sender name")
+    email: EmailStr
+    message: str = Field(..., min_length=5, description="Message body")
